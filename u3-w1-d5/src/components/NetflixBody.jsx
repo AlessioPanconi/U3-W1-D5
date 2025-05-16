@@ -1,12 +1,30 @@
 import { Component } from "react";
-import { Container, Row, Col, Image } from "react-bootstrap";
+import { Container, Row, Col, Image, Alert } from "react-bootstrap";
 
 class NetflixBody extends Component {
   state = {
     listaFilm: [],
+    alert: {
+      isVisible: false,
+      variant: "",
+      title: "",
+      content: "",
+    },
   };
 
   fetchFilm = () => {
+    if (!this.props.nome || this.props.nome.trim() === "") {
+      this.setState({
+        alert: {
+          isVisible: true,
+          variant: "danger",
+          title: "Input non valido",
+          content: "Il nome del film è mancante o non valido.",
+        },
+      });
+      return;
+    }
+
     fetch(`https://www.omdbapi.com/?s=${this.props.nome}&apikey=dbc1fa54`)
       .then((resp) => {
         if (resp.ok) {
@@ -17,10 +35,40 @@ class NetflixBody extends Component {
         }
       })
       .then((listaFilm) => {
-        console.log(listaFilm);
-        this.setState({ listaFilm: listaFilm.Search });
+        if (!listaFilm.Search || listaFilm.Search.length === 0) {
+          console.log("Ricerca Fallita");
+          this.setState({
+            alert: {
+              isVisible: true,
+              variant: "danger",
+              title: "Nessun risultato",
+              content: "La ricerca non ha trovato nessun film con questo nome.",
+            },
+          });
+          this.setState({ listaFilm: [] });
+        } else {
+          this.setState({
+            alert: {
+              isVisible: false,
+              variant: "",
+              title: "",
+              content: "",
+            },
+          });
+          this.setState({ listaFilm: listaFilm.Search });
+        }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("catch", err);
+        this.setState({
+          alert: {
+            isVisible: true,
+            variant: "danger",
+            title: "Errore nella ricerca",
+            content: err.message,
+          },
+        });
+      });
   };
 
   componentDidMount() {
@@ -31,6 +79,25 @@ class NetflixBody extends Component {
     return (
       <Container fluid>
         <h4 className="my-4">{this.props.title}</h4>
+        <Alert
+          show={this.state.alert.isVisible}
+          variant={this.state.alert.variant}
+          dismissible
+          onClose={() => {
+            this.setState({
+              alert: {
+                isVisible: false,
+                variant: "",
+                title: "",
+                content: "",
+              },
+            });
+          }}
+        >
+          <Alert.Heading>{this.state.alert.title}</Alert.Heading>
+          <p>{this.state.alert.content}</p>
+        </Alert>
+
         <Row xs={1} sm={2} md={3} xl={6} className="mb-4">
           {this.state.listaFilm.slice(0, 6).map((film) => (
             <Col key={film.imdbID} className="mb-2 text-center px-1">
