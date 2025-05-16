@@ -1,5 +1,8 @@
 import { Component } from "react";
-import { Container, Row, Col, Image, Alert } from "react-bootstrap";
+import { Container, Image, Alert } from "react-bootstrap";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 class NetflixBody extends Component {
   state = {
@@ -24,7 +27,6 @@ class NetflixBody extends Component {
       })
       .then((listaFilm) => {
         if (!listaFilm.Search || listaFilm.Search.length === 0) {
-          console.log("Ricerca Fallita");
           this.setState({
             alert: {
               isVisible: true,
@@ -47,7 +49,6 @@ class NetflixBody extends Component {
         }
       })
       .catch((err) => {
-        console.log("catch", err);
         this.setState({
           alert: {
             isVisible: true,
@@ -64,14 +65,56 @@ class NetflixBody extends Component {
   }
 
   render() {
+    const sliderSettings = {
+      dots: false,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 6,
+      slidesToScroll: 4,
+      initialSlide: 0,
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 4,
+            slidesToScroll: 4,
+          },
+        },
+        {
+          breakpoint: 750,
+          settings: {
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            initialSlide: 3,
+          },
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 2,
+            initialSlide: 2,
+          },
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+          },
+        },
+      ],
+    };
+
     return (
       <Container fluid>
         <h4 className="my-4">{this.props.title}</h4>
+
         <Alert
           show={this.state.alert.isVisible}
           variant={this.state.alert.variant}
           dismissible
-          onClose={() => {
+          onClose={() =>
             this.setState({
               alert: {
                 isVisible: false,
@@ -79,16 +122,16 @@ class NetflixBody extends Component {
                 title: "",
                 content: "",
               },
-            });
-          }}
+            })
+          }
         >
           <Alert.Heading>{this.state.alert.title}</Alert.Heading>
           <p>{this.state.alert.content}</p>
         </Alert>
 
-        <Row xs={1} sm={2} md={3} xl={6} className="mb-4">
-          {this.state.listaFilm.slice(0, 6).map((film) => (
-            <Col key={film.imdbID} className="mb-2 text-center px-1">
+        <Slider {...sliderSettings}>
+          {this.state.listaFilm.map((film) => (
+            <div key={film.imdbID} className="px-1 text-center">
               <Image
                 src={film.Poster}
                 alt={film.Title}
@@ -96,11 +139,12 @@ class NetflixBody extends Component {
                 style={{
                   aspectRatio: "2 / 3",
                   objectFit: "cover",
+                  margin: "0 auto",
                 }}
               />
-            </Col>
+            </div>
           ))}
-        </Row>
+        </Slider>
       </Container>
     );
   }
