@@ -129,22 +129,24 @@ class NetflixBody extends Component {
           <p>{this.state.alert.content}</p>
         </Alert>
 
-        <Slider {...sliderSettings}>
-          {this.state.listaFilm.map((film) => (
-            <div key={film.imdbID} className="px-1 text-center">
-              <Image
-                src={film.Poster}
-                alt={film.Title}
-                fluid
-                style={{
-                  aspectRatio: "2 / 3",
-                  objectFit: "cover",
-                  margin: "0 auto",
-                }}
-              />
-            </div>
-          ))}
-        </Slider>
+        {this.state.alert.isVisible ? null : (
+          <Slider {...sliderSettings}>
+            {this.state.listaFilm.map((film) => (
+              <div key={film.imdbID} className="px-1 text-center">
+                <Image
+                  src={film.Poster}
+                  alt={film.Title}
+                  fluid
+                  style={{
+                    aspectRatio: "2 / 3",
+                    objectFit: "cover",
+                    margin: "0 auto",
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        )}
       </Container>
     );
   }
