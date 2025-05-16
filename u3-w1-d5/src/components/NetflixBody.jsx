@@ -13,18 +13,6 @@ class NetflixBody extends Component {
   };
 
   fetchFilm = () => {
-    if (!this.props.nome || this.props.nome.trim() === "") {
-      this.setState({
-        alert: {
-          isVisible: true,
-          variant: "danger",
-          title: "Input non valido",
-          content: "Il nome del film è mancante o non valido.",
-        },
-      });
-      return;
-    }
-
     fetch(`https://www.omdbapi.com/?s=${this.props.nome}&apikey=dbc1fa54`)
       .then((resp) => {
         if (resp.ok) {
